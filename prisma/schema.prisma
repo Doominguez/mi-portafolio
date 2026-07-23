@@ -8,13 +8,19 @@ datasource db {
 }
 
 model Proyecto {
-  id            String   @id @default(cuid())
-  titulo        String
-  descripcion   String
-  imagenUrl     String
-  linkDemo      String?
-  linkGithub    String?
-  tecnologias   String[]
-  destacado     Boolean  @default(false)
-  createdAt     DateTime @default(now())
+  id              String   @id @default(cuid())
+  titulo          String
+  descripcion     String
+  imagenUrl       String
+  linkDemo        String?
+  linkGithub      String?
+  tecnologias     String[]
+  destacado       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  screenshots     String[]
+  videoUrl        String?
+  funcionalidades String[]
+  desafios        String?
+  aprendizajes    String?
 }
