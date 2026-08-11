@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { GithubIcon, LinkedinIcon } from "./SocialIcons";
 import ThemeToggle from "./ThemeToggle";
 
 const links = [
@@ -100,52 +99,11 @@ export default function Navbar() {
           </ul>
 
           <div className="w-px h-6 bg-[var(--border)]" />
-
-          <div className="flex items-center gap-1">
-            <a
-              href="https://github.com/doominguez"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-md hover:bg-[var(--surface)] transition-colors"
-              aria-label="GitHub"
-            >
-              <GithubIcon className="w-[18px] h-[18px] text-[var(--text-2)] hover:text-[var(--text)]" />
-            </a>
-            <a
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-md hover:bg-[var(--surface)] transition-colors"
-              aria-label="LinkedIn"
-            >
-              <LinkedinIcon className="w-[18px] h-[18px] text-[var(--text-2)] hover:text-[var(--text)]" />
-            </a>
-            <div className="w-px h-4 bg-[var(--border)] mx-1" />
-            <ThemeToggle />
-          </div>
+          <ThemeToggle />
         </div>
 
-        {/* Mobile: social icons + toggle + hamburger */}
+        {/* Mobile: toggle + hamburger */}
         <div className="flex md:hidden items-center gap-1.5">
-          <a
-            href="https://github.com/doominguez"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-3 rounded-md"
-            aria-label="GitHub"
-          >
-            <GithubIcon className="w-5 h-5 text-[var(--text-2)]" />
-          </a>
-          <a
-            href="#"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-3 rounded-md"
-            aria-label="LinkedIn"
-          >
-            <LinkedinIcon className="w-5 h-5 text-[var(--text-2)]" />
-          </a>
-          <div className="w-px h-4 bg-[var(--border)] mx-1" />
           <ThemeToggle className="p-3" />
           <button
             onClick={() => setMenuOpen(!menuOpen)}

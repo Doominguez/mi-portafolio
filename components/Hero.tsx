@@ -178,7 +178,7 @@ export default function Hero() {
       <a
         href="#proyectos"
         aria-label="Bajar a la sección de proyectos"
-        className="absolute left-1/2 -translate-x-1/2 bottom-6 md:bottom-8 z-10 flex items-center justify-center text-[var(--text-2)] transition-colors hover:text-[var(--accent)]"
+        className="hidden md:flex absolute left-1/2 -translate-x-1/2 bottom-6 md:bottom-8 z-10 items-center justify-center text-[var(--text-2)] transition-colors hover:text-[var(--accent)]"
       >
         <svg
           width="24"
