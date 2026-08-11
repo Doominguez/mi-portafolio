@@ -25,10 +25,17 @@ export default function LoginPage() {
       headers: { "Content-Type": "application/json" },
     });
 
-    const data = await res.json();
+    let data: { success: boolean; error?: string };
+    try {
+      data = await res.json();
+    } catch {
+      data = { success: false };
+    }
     setLoading(false);
 
-    if (!data.success) {
+    if (res.status === 429) {
+      setError(data.error || "Demasiados intentos. Intentá más tarde.");
+    } else if (!data.success) {
       setError("Email o contraseña incorrectos");
     } else {
       router.push("/admin");

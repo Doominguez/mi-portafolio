@@ -19,6 +19,40 @@ function parseArrayField(raw: string | null): string[] {
     .filter(Boolean);
 }
 
+function isValidHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function requireValidUrl(value: string | null | undefined, label: string): void {
+  if (!value) return;
+  if (!isValidHttpUrl(value)) {
+    throw new Error(`La URL de ${label} es inválida`);
+  }
+}
+
+function validateProyectoFields(input: {
+  imagenUrl: string;
+  linkDemo: string | null;
+  linkGithub: string | null;
+  videoUrl: string | null;
+  screenshots: string[];
+}): void {
+  if (!isValidHttpUrl(input.imagenUrl)) {
+    throw new Error("La URL de imagen es inválida");
+  }
+  requireValidUrl(input.linkDemo, "la demo");
+  requireValidUrl(input.linkGithub, "GitHub");
+  requireValidUrl(input.videoUrl, "el video");
+  for (const shot of input.screenshots) {
+    requireValidUrl(shot, "un screenshot");
+  }
+}
+
 export async function crearProyecto(formData: FormData) {
   await requireAdmin();
 
@@ -40,6 +74,8 @@ export async function crearProyecto(formData: FormData) {
   const funcionalidades = funcionalidadesRaw
     ? funcionalidadesRaw.split("\n").map((f) => f.trim()).filter(Boolean)
     : [];
+
+  validateProyectoFields({ imagenUrl, linkDemo, linkGithub, videoUrl, screenshots });
 
   await prisma.proyecto.create({
     data: {
@@ -86,6 +122,8 @@ export async function editarProyecto(idOrFormData: string | FormData, maybeFormD
   const funcionalidades = funcionalidadesRaw
     ? funcionalidadesRaw.split("\n").map((f) => f.trim()).filter(Boolean)
     : [];
+
+  validateProyectoFields({ imagenUrl, linkDemo, linkGithub, videoUrl, screenshots });
 
   await prisma.proyecto.update({
     where: { id },
