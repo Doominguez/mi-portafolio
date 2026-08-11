@@ -15,12 +15,14 @@ export default async function Proyectos() {
   }
 
   return (
-    <section id="proyectos" className="section-padding">
-      <div className="container-portfolio">
+    <section className="section-padding">
+      <div id="proyectos" className="container-portfolio scroll-mt-24">
         <div className="section-label">01 / Proyectos</div>
-        <h2 className="heading-xl mb-16">
-          Proyectos
-        </h2>
+        <h2 className="heading-xl mb-4">Proyectos</h2>
+        <p className="text-body text-[var(--text-2)] mb-16 max-w-lg">
+          Una selección de sistemas y aplicaciones que he diseñado y
+          desarrollado.
+        </p>
         <ProyectosList destacados={destacados} otros={otros} />
       </div>
     </section>

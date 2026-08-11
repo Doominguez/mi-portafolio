@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import { Mail, Download, ArrowRight } from "lucide-react";
-import { GithubIcon, LinkedinIcon } from "./SocialIcons";
+import { GithubIcon, LinkedinIcon, JavaIcon } from "./SocialIcons";
+import EmailLink from "./EmailLink";
 
 export default function Hero() {
   return (
@@ -47,11 +48,8 @@ export default function Hero() {
             >
               Desarrollador Backend{" "}
               <span className="inline-flex items-center gap-1.5">
-                Java{" "}
-                <i
-                  className="fa-brands fa-java"
-                  style={{ color: "var(--accent)" }}
-                />
+                Java
+                <JavaIcon className="h-5 w-5 text-[var(--accent)]" />
               </span>
             </motion.p>
 
@@ -117,13 +115,10 @@ export default function Hero() {
                   LinkedIn
                 </a>
                 <span className="text-[var(--border)]">|</span>
-                <a
-                  href="mailto:Juniordomontero@gmail.com"
-                  className="flex items-center gap-1.5 hover:text-[var(--text)] transition-colors"
-                >
+                <EmailLink className="flex items-center gap-1.5 hover:text-[var(--text)] transition-colors">
                   <Mail className="w-4 h-4" />
                   Email
-                </a>
+                </EmailLink>
               </div>
             </motion.div>
           </div>
@@ -164,6 +159,40 @@ export default function Hero() {
           </motion.div>
         </div>
       </div>
+
+      {/* Indicador de scroll */}
+      <a
+        href="#proyectos"
+        aria-label="Bajar a la sección de proyectos"
+        className="absolute left-1/2 -translate-x-1/2 bottom-6 md:bottom-8 z-10 flex items-center justify-center text-[var(--text-2)] transition-colors hover:text-[var(--accent)]"
+      >
+        <svg
+          width="24"
+          height="38"
+          viewBox="0 0 24 38"
+          fill="none"
+          aria-hidden="true"
+          className="block"
+        >
+          <rect
+            x="1.5"
+            y="1.5"
+            width="21"
+            height="35"
+            rx="10.5"
+            stroke="currentColor"
+            strokeOpacity="0.35"
+            strokeWidth="1.5"
+          />
+          <circle
+            className="animate-scroll-wheel"
+            cx="12"
+            cy="9"
+            r="1.8"
+            fill="currentColor"
+          />
+        </svg>
+      </a>
     </section>
   );
 }

@@ -107,7 +107,6 @@ export async function editarProyecto(idOrFormData: string | FormData, maybeFormD
 
   revalidatePath("/");
   revalidatePath("/admin");
-  revalidatePath(`/proyectos/${id}`);
   redirect("/admin");
 }
 

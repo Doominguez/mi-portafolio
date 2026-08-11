@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "./SocialIcons";
@@ -10,11 +11,12 @@ import ThemeToggle from "./ThemeToggle";
 const links = [
   { label: "Proyectos", href: "#proyectos" },
   { label: "Habilidades", href: "#habilidades" },
-  { label: "Educacion", href: "#educacion" },
+  { label: "Educación", href: "#educacion" },
   { label: "Contacto", href: "#contacto" },
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const [scrolled, setScrolled] = useState(false);
@@ -46,6 +48,9 @@ export default function Navbar() {
     return () => observer.disconnect();
   }, []);
 
+  // El navbar del portfolio no aplica en el panel de administración.
+  if (pathname?.startsWith("/admin")) return null;
+
   return (
     <nav
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
@@ -55,7 +60,19 @@ export default function Navbar() {
       }`}
     >
       <div className="container-portfolio flex justify-between items-center h-16">
-        <Link href="/" className="flex items-center shrink-0" data-vt-logo style={{ viewTransitionName: "logo" }}>
+        <Link
+          href="/"
+          onClick={(e) => {
+            if (pathname === "/") {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+          className="flex items-center shrink-0"
+          data-vt-logo
+          style={{ viewTransitionName: "logo" }}
+          aria-label="Volver al inicio"
+        >
           <img src="/logo-claro.png" alt="JDM" className="h-14 w-auto object-contain hidden dark:block" />
           <img src="/logo-oscuro.png" alt="JDM" className="h-14 w-auto object-contain block dark:hidden" />
         </Link>
@@ -81,6 +98,8 @@ export default function Navbar() {
               );
             })}
           </ul>
+
+          <div className="w-px h-6 bg-[var(--border)]" />
 
           <div className="flex items-center gap-1">
             <a

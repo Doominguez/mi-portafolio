@@ -14,7 +14,7 @@ const habilidades = [
   { label: "Trabajo en equipo", icon: Users },
   { label: "Comunicacion", icon: MessageSquare },
   { label: "Resolucion de problemas", icon: Lightbulb },
-  { label: "Gestion del tiempo", icon: Clock },
+  { label: "Gestión del tiempo", icon: Clock },
   { label: "Aprendizaje continuo", icon: BookOpen },
   { label: "Orientacion a resultados", icon: Target },
 ];

@@ -22,6 +22,9 @@ interface ProyectoFormProps {
   proyectoId?: string;
 }
 
+const labelClass = "mb-1.5 block text-sm font-medium text-[var(--text)]";
+const hintClass = "mt-1.5 text-xs leading-relaxed text-[var(--text-2)]";
+
 export default function ProyectoForm({
   initialData,
   onSubmit,
@@ -59,176 +62,176 @@ export default function ProyectoForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {proyectoId && <input type="hidden" name="proyectoId" value={proyectoId} />}
+
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-          Titulo
-        </label>
+        <label className={labelClass}>Título</label>
         <input
           name="titulo"
           defaultValue={initialData?.titulo}
           required
-          className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+          placeholder="Ej. LumenStore — Sistema de Gestión Comercial"
+          className="input-field"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-          Descripcion
-        </label>
+        <label className={labelClass}>Descripción</label>
         <textarea
           name="descripcion"
           defaultValue={initialData?.descripcion}
           required
-          rows={4}
-          className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+          rows={5}
+          placeholder={
+            "Resumen: Qué hace el proyecto en 1-2 líneas.\nEl problema: Qué problema resuelve.\nLa solución: Cómo lo resuelve.\nImpacto: Resultados o métricas."
+          }
+          className="input-field"
         />
+        <p className={hintClass}>
+          Usá una etiqueta por línea ({"Resumen:"}, {"El problema:"}, {"La solución:"},{" "}
+          {"Impacto:"}) para que el modal las muestre como viñetas. Sin etiquetas, se
+          mostrará como párrafo.
+        </p>
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-          Imagen
-        </label>
+        <label className={labelClass}>Imagen principal</label>
         <input
           ref={fileRef}
           type="file"
           accept="image/*"
           onChange={handleUpload}
-          className="w-full text-sm text-neutral-500 file:mr-4 file:rounded-lg file:border-0 file:bg-neutral-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-neutral-700 hover:file:bg-neutral-200 dark:file:bg-neutral-800 dark:file:text-neutral-300"
+          className="w-full text-sm text-[var(--text-2)] file:mr-4 file:cursor-pointer file:rounded-md file:border-0 file:bg-[var(--surface)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-[var(--text)] hover:file:bg-[var(--border)]"
         />
         {uploading && (
-          <p className="mt-1 text-sm text-neutral-500">Subiendo imagen...</p>
+          <p className="mt-1.5 text-sm text-[var(--text-2)]">
+            Subiendo imagen...
+          </p>
         )}
         {imagenUrl && (
           <img
             src={imagenUrl}
-            alt="Preview"
-            className="mt-3 h-40 rounded-lg object-cover"
+            alt="Vista previa de la imagen principal"
+            className="mt-3 h-40 rounded-lg border border-[var(--border)] object-cover"
           />
         )}
         <input type="hidden" name="imagenUrl" value={imagenUrl} />
+        <p className={hintClass}>
+          Si no subís imagen, se genera automáticamente una vista previa del
+          proyecto.
+        </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-            Link Demo
-          </label>
+          <label className={labelClass}>Link Demo</label>
           <input
             name="linkDemo"
             defaultValue={initialData?.linkDemo}
             placeholder="https://..."
-            className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+            className="input-field"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-            Link GitHub
-          </label>
+          <label className={labelClass}>Link GitHub</label>
           <input
             name="linkGithub"
             defaultValue={initialData?.linkGithub}
             placeholder="https://github.com/..."
-            className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+            className="input-field"
           />
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-          Tecnologias (separadas por coma)
-        </label>
+        <label className={labelClass}>Tecnologías (separadas por coma)</label>
         <input
           name="tecnologias"
           defaultValue={initialData?.tecnologias}
           required
-          placeholder="React, Next.js, TypeScript"
-          className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+          placeholder="Angular, TypeScript, Spring Boot, MySQL"
+          className="input-field"
         />
+        <p className={hintClass}>
+          En el modal se agrupan automáticamente por categoría (Frontend,
+          Backend, Base de datos, DevOps).
+        </p>
       </div>
 
-      <label className="flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-300">
+      <label className="flex w-fit cursor-pointer items-center gap-2.5 text-sm font-medium text-[var(--text)]">
         <input
           type="checkbox"
           name="destacado"
           defaultChecked={initialData?.destacado}
-          className="h-4 w-4 rounded border-neutral-300"
+          className="h-4 w-4 rounded border-[var(--border)] accent-[var(--accent)]"
         />
         Proyecto destacado
       </label>
 
-      <div className="divider my-6" />
+      <div className="divider" />
 
-      <h3 className="text-sm font-bold text-neutral-900 dark:text-neutral-50 uppercase tracking-wider">
-        Contenido del dialog
+      <h3 className="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-[var(--text-2)]">
+        Contenido del modal
       </h3>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-          URL Video demo (opcional, 16:9)
-        </label>
+        <label className={labelClass}>URL del video demo (opcional, 16:9)</label>
         <input
           name="videoUrl"
           defaultValue={initialData?.videoUrl}
           placeholder="https://...mp4"
-          className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+          className="input-field"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+        <label className={labelClass}>
           Screenshots (URLs separadas por coma)
         </label>
         <input
           name="screenshots"
           defaultValue={initialData?.screenshots}
           placeholder="https://...jpg, https://...png"
-          className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+          className="input-field"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-          Funcionalidades clave (una por linea)
-        </label>
+        <label className={labelClass}>Funcionalidades clave (una por línea)</label>
         <textarea
           name="funcionalidades"
           defaultValue={initialData?.funcionalidades}
           rows={4}
-          placeholder="Autenticacion JWT&#10;Dashboard en tiempo real&#10;Exportacion a PDF"
-          className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+          placeholder="Autenticación JWT&#10;Dashboard en tiempo real&#10;Exportación a PDF"
+          className="input-field"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-          Desafios tecnicos (opcional)
-        </label>
+        <label className={labelClass}>Desafíos técnicos (opcional)</label>
         <textarea
           name="desafios"
           defaultValue={initialData?.desafios}
           rows={3}
-          className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+          className="input-field"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-          Aprendizajes (opcional)
-        </label>
+        <label className={labelClass}>Aprendizajes (opcional)</label>
         <textarea
           name="aprendizajes"
           defaultValue={initialData?.aprendizajes}
           rows={3}
-          className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+          className="input-field"
         />
       </div>
 
       <button
         type="submit"
         disabled={saving || uploading}
-        className="w-full rounded-lg bg-neutral-900 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-neutral-700 disabled:opacity-50 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+        className="btn-primary w-full"
       >
         {saving ? "Guardando..." : submitLabel}
       </button>

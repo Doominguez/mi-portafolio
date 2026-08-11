@@ -12,12 +12,12 @@ const fadeUp = {
 
 export default function Educacion() {
   return (
-    <section id="educacion" className="section-padding bg-[var(--bg-2)]">
-      <div className="container-portfolio">
+    <section className="section-padding bg-[var(--bg-2)]">
+      <div id="educacion" className="container-portfolio scroll-mt-24">
         <motion.div {...fadeUp}>
-          <div className="section-label">04 / Formacion</div>
+          <div className="section-label">04 / Formación</div>
           <h2 className="heading-xl mb-16">
-            Formacion e idiomas
+            Formación e idiomas
           </h2>
         </motion.div>
 

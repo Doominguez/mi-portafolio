@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { Lock, AlertCircle, ArrowRight } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,40 +36,54 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-[70vh] items-center justify-center px-6">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
-        <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
-          Panel Admin
-        </h1>
+    <div className="flex min-h-[80vh] items-center justify-center">
+      <div className="card w-full max-w-sm p-8">
+        <div className="mb-8 flex flex-col items-center gap-3 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent)] text-white">
+            <Lock className="h-5 w-5" />
+          </span>
+          <div>
+            <h1 className="heading-lg">Panel Admin</h1>
+            <p className="mt-1 text-sm text-[var(--text-2)]">
+              Iniciá sesión para gestionar tus proyectos
+            </p>
+          </div>
+        </div>
 
         {error && (
-          <p className="text-sm text-red-600">{error}</p>
+          <p className="mb-5 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-600 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            {error}
+          </p>
         )}
 
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          required
-          className="w-full rounded-lg border border-neutral-300 px-4 py-3 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
-        />
-
-        <input
-          name="password"
-          type="password"
-          placeholder="Contraseña"
-          required
-          className="w-full rounded-lg border border-neutral-300 px-4 py-3 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
-        />
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-lg bg-neutral-900 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-neutral-700 disabled:opacity-50 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
-        >
-          {loading ? "Entrando..." : "Iniciar sesion"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            required
+            autoComplete="email"
+            className="input-field"
+          />
+          <input
+            name="password"
+            type="password"
+            placeholder="Contraseña"
+            required
+            autoComplete="current-password"
+            className="input-field"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-primary w-full"
+          >
+            {loading ? "Entrando..." : "Iniciar sesión"}
+            {!loading && <ArrowRight className="h-4 w-4" />}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

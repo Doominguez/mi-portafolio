@@ -4,6 +4,7 @@ import { getProyectoById } from "@/lib/proyectos";
 import { editarProyecto } from "@/lib/actions";
 import ProyectoForm from "@/components/ProyectoForm";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -20,40 +21,40 @@ export default async function EditarProyectoPage({ params }: Props) {
   if (!proyecto) notFound();
 
   return (
-    <div className="px-6 py-12">
-      <div className="mx-auto max-w-2xl">
-        <Link
-          href="/admin"
-          className="text-sm text-neutral-500 underline-offset-4 hover:underline dark:text-neutral-400"
-        >
-          &larr; Volver
-        </Link>
+    <div className="flex flex-col gap-6">
+      <Link
+        href="/admin"
+        className="inline-flex w-fit items-center gap-1.5 text-sm text-[var(--text-2)] transition-colors hover:text-[var(--text)]"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Volver al listado
+      </Link>
 
-        <h1 className="mt-6 text-2xl font-bold text-neutral-900 dark:text-neutral-50">
-          Editar proyecto
-        </h1>
+      <div>
+        <div className="section-label mb-2">Panel de administración</div>
+        <h1 className="heading-xl">Editar proyecto</h1>
+      </div>
 
-        <div className="mt-8">
-          <ProyectoForm
-            initialData={{
-              titulo: proyecto.titulo,
-              descripcion: proyecto.descripcion,
-              imagenUrl: proyecto.imagenUrl,
-              linkDemo: proyecto.linkDemo || "",
-              linkGithub: proyecto.linkGithub || "",
-              tecnologias: proyecto.tecnologias.join(", "),
-              destacado: proyecto.destacado,
-              screenshots: proyecto.screenshots?.join(", ") || "",
-              videoUrl: proyecto.videoUrl || "",
-              funcionalidades: proyecto.funcionalidades?.join("\n") || "",
-              desafios: proyecto.desafios || "",
-              aprendizajes: proyecto.aprendizajes || "",
-            }}
-            onSubmit={editarProyecto}
-            submitLabel="Guardar cambios"
-            proyectoId={id}
-          />
-        </div>
+      <div className="card p-6 sm:p-8">
+        <ProyectoForm
+          initialData={{
+            titulo: proyecto.titulo,
+            descripcion: proyecto.descripcion,
+            imagenUrl: proyecto.imagenUrl,
+            linkDemo: proyecto.linkDemo || "",
+            linkGithub: proyecto.linkGithub || "",
+            tecnologias: proyecto.tecnologias.join(", "),
+            destacado: proyecto.destacado,
+            screenshots: proyecto.screenshots?.join(", ") || "",
+            videoUrl: proyecto.videoUrl || "",
+            funcionalidades: proyecto.funcionalidades?.join("\n") || "",
+            desafios: proyecto.desafios || "",
+            aprendizajes: proyecto.aprendizajes || "",
+          }}
+          onSubmit={editarProyecto}
+          submitLabel="Guardar cambios"
+          proyectoId={id}
+        />
       </div>
     </div>
   );

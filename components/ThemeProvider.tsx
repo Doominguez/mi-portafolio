@@ -1,8 +1,52 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useSyncExternalStore,
+} from "react";
 
 type Theme = "light" | "dark";
+
+const STORAGE_KEY = "theme";
+const listeners = new Set<() => void>();
+
+function getStoredTheme(): Theme | null {
+  if (typeof window === "undefined") return null;
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return stored === "light" || stored === "dark" ? stored : null;
+}
+
+function getSystemTheme(): Theme {
+  return typeof window !== "undefined" &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+function getTheme(): Theme {
+  return getStoredTheme() ?? getSystemTheme();
+}
+
+function emitThemeChange() {
+  for (const listener of listeners) listener();
+}
+
+function subscribeTheme(callback: () => void) {
+  listeners.add(callback);
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  const handleSystemChange = () => {
+    // Solo reaccionar a cambios del sistema si el usuario no eligió uno.
+    if (!getStoredTheme()) callback();
+  };
+  mq.addEventListener("change", handleSystemChange);
+  return () => {
+    listeners.delete(callback);
+    mq.removeEventListener("change", handleSystemChange);
+  };
+}
 
 const ThemeContext = createContext<{
   theme: Theme;
@@ -13,28 +57,26 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-export default function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light");
-  const [mounted, setMounted] = useState(false);
+export default function ThemeProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const theme = useSyncExternalStore<Theme>(
+    subscribeTheme,
+    getTheme,
+    () => "light",
+  );
 
   useEffect(() => {
-    setMounted(true);
-    const stored = localStorage.getItem("theme") as Theme | null;
-    const preferred = window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-    setTheme(stored || preferred);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
     document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("theme", theme);
-  }, [theme, mounted]);
+  }, [theme]);
 
-  const toggle = () => setTheme((t) => (t === "light" ? "dark" : "light"));
-
-  if (!mounted) return <>{children}</>;
+  const toggle = useCallback(() => {
+    const next: Theme = getTheme() === "dark" ? "light" : "dark";
+    localStorage.setItem(STORAGE_KEY, next);
+    emitThemeChange();
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ theme, toggle }}>
