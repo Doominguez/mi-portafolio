@@ -6,8 +6,37 @@ import { GithubIcon, LinkedinIcon, JavaIcon } from "./SocialIcons";
 import EmailLink from "./EmailLink";
 
 export default function Hero() {
+  const avatarContent = (
+    <div className="relative">
+      {/* Subtle blue glow */}
+      <div
+        className="absolute inset-0 rounded-full pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)",
+          transform: "scale(1.3)",
+          filter: "blur(20px)",
+        }}
+      />
+      {/* Avatar */}
+      <div
+        className="relative w-[min(220px,60vw)] h-[min(220px,60vw)] lg:w-[300px] lg:h-[300px] rounded-full overflow-hidden"
+        style={{
+          border: "2px solid var(--border)",
+          boxShadow: "0 0 0 6px var(--bg), 0 0 0 7px var(--border)",
+        }}
+      >
+        <img
+          src="/mifoto.png"
+          alt="Junior Dominguez Montero"
+          className="w-full h-full object-cover"
+        />
+      </div>
+    </div>
+  );
+
   return (
-    <section className="min-h-screen flex items-center relative">
+    <section className="min-h-dvh flex items-center relative overflow-x-clip">
       {/* Subtle background gradient for depth */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -17,7 +46,7 @@ export default function Hero() {
         }}
       />
 
-      <div className="container-portfolio py-32 md:py-0 relative z-10">
+      <div className="container-portfolio py-24 md:py-0 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-12 md:gap-16 items-center">
           {/* Text - 3 columns */}
           <div className="md:col-span-3">
@@ -25,7 +54,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="mb-3"
+              className="mb-6"
               style={{
                 viewTransitionName: "hero-title",
                 viewTransitionClass: "title-morph",
@@ -44,20 +73,30 @@ export default function Hero() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-lg md:text-xl font-medium text-[var(--accent)] mb-6"
+              className="text-lg md:text-xl font-medium text-[var(--accent-text)] mb-8"
             >
               Desarrollador Backend{" "}
-              <span className="inline-flex items-center gap-1.5">
+              <span className="inline-flex items-center gap-2">
                 Java
-                <JavaIcon className="h-5 w-5 text-[var(--accent)]" />
+                <JavaIcon className="h-6 w-auto" />
               </span>
             </motion.p>
+
+            {/* Avatar en móvil: justo debajo del subtítulo, antes de los botones */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.25 }}
+              className="md:hidden flex justify-center mb-10"
+            >
+              {avatarContent}
+            </motion.div>
 
             <motion.p
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="text-body text-[var(--text-2)] mb-8 max-w-xl leading-relaxed"
+              className="text-body text-[var(--text-2)] mb-10 max-w-xl leading-relaxed"
             >
               Desarrollo aplicaciones web y APIs REST con Java y Spring Boot,
               aplicando arquitectura de software, seguridad y buenas prácticas
@@ -84,8 +123,8 @@ export default function Hero() {
                   href="#proyectos"
                   className="btn-secondary"
                   style={{
-                    borderColor: "var(--accent)",
-                    color: "var(--accent)",
+                    borderColor: "var(--accent-text)",
+                    color: "var(--accent-text)",
                   }}
                 >
                   Ver proyectos
@@ -123,39 +162,14 @@ export default function Hero() {
             </motion.div>
           </div>
 
-          {/* Avatar - 2 columns */}
+          {/* Avatar - 2 columns (solo desktop, en móvil va debajo del subtítulo) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="md:col-span-2 flex justify-center md:justify-end"
+            className="hidden md:flex md:col-span-2 justify-center md:justify-end"
           >
-            <div className="relative">
-              {/* Subtle blue glow */}
-              <div
-                className="absolute inset-0 rounded-full pointer-events-none"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)",
-                  transform: "scale(1.3)",
-                  filter: "blur(20px)",
-                }}
-              />
-              {/* Avatar */}
-              <div
-                className="relative w-[220px] h-[220px] lg:w-[300px] lg:h-[300px] rounded-full overflow-hidden"
-                style={{
-                  border: "2px solid var(--border)",
-                  boxShadow: "0 0 0 6px var(--bg), 0 0 0 7px var(--border)",
-                }}
-              >
-                <img
-                  src="/mifoto.png"
-                  alt="Junior Dominguez Montero"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
+            {avatarContent}
           </motion.div>
         </div>
       </div>

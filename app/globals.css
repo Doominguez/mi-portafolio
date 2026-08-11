@@ -16,6 +16,7 @@
     --border: #e5e5ea;
     --accent: #007396;
     --accent-hover: #0891b8;
+    --accent-text: #007396;
     --surface: #f0f0f2;
     --pastel-cream: #fbf0d8;
     --pastel-pink: #fadce3;
@@ -31,6 +32,7 @@
     --border: #262629;
     --accent: #007396;
     --accent-hover: #0891b8;
+    --accent-text: #2fb8d1;
     --surface: #1e1e22;
     --pastel-cream: #2b2416;
     --pastel-pink: #331f26;
@@ -174,7 +176,7 @@
 
   .chip-primary {
     background-color: rgba(0, 115, 150, 0.12);
-    color: var(--accent);
+    color: var(--accent-text);
     font-weight: 600;
   }
 
@@ -365,7 +367,7 @@
     letter-spacing: 0.02em;
     border: 1px solid rgba(0, 115, 150, 0.38);
     border-radius: 6px;
-    color: var(--accent);
+    color: var(--accent-text);
     background-color: rgba(0, 115, 150, 0.07);
     transition:
       background-color 0.2s ease,
@@ -468,7 +470,7 @@
   }
 
   .card-details-link:hover {
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   .card-details-link:focus-visible {
@@ -488,7 +490,7 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     background-color: rgba(0, 115, 150, 0.16);
-    color: var(--accent);
+    color: var(--accent-text);
     backdrop-filter: blur(10px);
   }
 

@@ -88,7 +88,7 @@ export default function Navbar() {
                     href={link.href}
                     className={`transition-colors duration-200 ${
                       isActive
-                        ? "text-[var(--accent)]"
+                        ? "text-[var(--accent-text)]"
                         : "text-[var(--text-2)] hover:text-[var(--text)]"
                     }`}
                   >
@@ -126,30 +126,30 @@ export default function Navbar() {
         </div>
 
         {/* Mobile: social icons + toggle + hamburger */}
-        <div className="flex md:hidden items-center gap-1">
+        <div className="flex md:hidden items-center gap-1.5">
           <a
             href="https://github.com/doominguez"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 rounded-md"
+            className="p-3 rounded-md"
             aria-label="GitHub"
           >
-            <GithubIcon className="w-[18px] h-[18px] text-[var(--text-2)]" />
+            <GithubIcon className="w-5 h-5 text-[var(--text-2)]" />
           </a>
           <a
             href="#"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 rounded-md"
+            className="p-3 rounded-md"
             aria-label="LinkedIn"
           >
-            <LinkedinIcon className="w-[18px] h-[18px] text-[var(--text-2)]" />
+            <LinkedinIcon className="w-5 h-5 text-[var(--text-2)]" />
           </a>
           <div className="w-px h-4 bg-[var(--border)] mx-1" />
-          <ThemeToggle />
+          <ThemeToggle className="p-3" />
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="p-2 rounded-md"
+            className="p-3 rounded-md"
             aria-label="Menu"
           >
             {menuOpen ? (
@@ -177,7 +177,7 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
-                  className="text-base font-medium text-[var(--text-2)] hover:text-[var(--text)] transition-colors py-2"
+                  className="text-base font-medium text-[var(--text-2)] hover:text-[var(--text)] transition-colors py-3"
                 >
                   {link.label}
                 </a>
