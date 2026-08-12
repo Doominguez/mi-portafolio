@@ -28,7 +28,10 @@ function isValidHttpUrl(value: string): boolean {
   }
 }
 
-function requireValidUrl(value: string | null | undefined, label: string): void {
+function requireValidUrl(
+  value: string | null | undefined,
+  label: string,
+): void {
   if (!value) return;
   if (!isValidHttpUrl(value)) {
     throw new Error(`La URL de ${label} es inválida`);
@@ -42,7 +45,9 @@ function validateProyectoFields(input: {
   videoUrl: string | null;
   screenshots: string[];
 }): void {
-  if (!isValidHttpUrl(input.imagenUrl)) {
+  // La imagen principal es opcional: si viene vacía se muestra el
+  // placeholder generativo en la card y el modal.
+  if (input.imagenUrl && !isValidHttpUrl(input.imagenUrl)) {
     throw new Error("La URL de imagen es inválida");
   }
   requireValidUrl(input.linkDemo, "la demo");
@@ -65,17 +70,27 @@ export async function crearProyecto(formData: FormData) {
   const destacado = formData.get("destacado") === "on";
   const videoUrl = (formData.get("videoUrl") as string) || null;
   const screenshotsRaw = (formData.get("screenshots") as string) || null;
-  const funcionalidadesRaw = (formData.get("funcionalidades") as string) || null;
+  const funcionalidadesRaw =
+    (formData.get("funcionalidades") as string) || null;
   const desafios = (formData.get("desafios") as string) || null;
   const aprendizajes = (formData.get("aprendizajes") as string) || null;
 
   const tecnologias = parseArrayField(tecnologiasRaw);
   const screenshots = parseArrayField(screenshotsRaw);
   const funcionalidades = funcionalidadesRaw
-    ? funcionalidadesRaw.split("\n").map((f) => f.trim()).filter(Boolean)
+    ? funcionalidadesRaw
+        .split("\n")
+        .map((f) => f.trim())
+        .filter(Boolean)
     : [];
 
-  validateProyectoFields({ imagenUrl, linkDemo, linkGithub, videoUrl, screenshots });
+  validateProyectoFields({
+    imagenUrl,
+    linkDemo,
+    linkGithub,
+    videoUrl,
+    screenshots,
+  });
 
   await prisma.proyecto.create({
     data: {
@@ -99,9 +114,16 @@ export async function crearProyecto(formData: FormData) {
   redirect("/admin");
 }
 
-export async function editarProyecto(idOrFormData: string | FormData, maybeFormData?: FormData) {
-  const id = typeof idOrFormData === "string" ? idOrFormData : (idOrFormData.get("proyectoId") as string);
-  const formData = typeof idOrFormData === "string" ? maybeFormData! : idOrFormData;
+export async function editarProyecto(
+  idOrFormData: string | FormData,
+  maybeFormData?: FormData,
+) {
+  const id =
+    typeof idOrFormData === "string"
+      ? idOrFormData
+      : (idOrFormData.get("proyectoId") as string);
+  const formData =
+    typeof idOrFormData === "string" ? maybeFormData! : idOrFormData;
   await requireAdmin();
 
   const titulo = formData.get("titulo") as string;
@@ -113,17 +135,27 @@ export async function editarProyecto(idOrFormData: string | FormData, maybeFormD
   const destacado = formData.get("destacado") === "on";
   const videoUrl = (formData.get("videoUrl") as string) || null;
   const screenshotsRaw = (formData.get("screenshots") as string) || null;
-  const funcionalidadesRaw = (formData.get("funcionalidades") as string) || null;
+  const funcionalidadesRaw =
+    (formData.get("funcionalidades") as string) || null;
   const desafios = (formData.get("desafios") as string) || null;
   const aprendizajes = (formData.get("aprendizajes") as string) || null;
 
   const tecnologias = parseArrayField(tecnologiasRaw);
   const screenshots = parseArrayField(screenshotsRaw);
   const funcionalidades = funcionalidadesRaw
-    ? funcionalidadesRaw.split("\n").map((f) => f.trim()).filter(Boolean)
+    ? funcionalidadesRaw
+        .split("\n")
+        .map((f) => f.trim())
+        .filter(Boolean)
     : [];
 
-  validateProyectoFields({ imagenUrl, linkDemo, linkGithub, videoUrl, screenshots });
+  validateProyectoFields({
+    imagenUrl,
+    linkDemo,
+    linkGithub,
+    videoUrl,
+    screenshots,
+  });
 
   await prisma.proyecto.update({
     where: { id },
@@ -155,4 +187,98 @@ export async function eliminarProyecto(id: string) {
 
   revalidatePath("/");
   revalidatePath("/admin");
+}
+
+function parseInteger(value: string | null, fallback: number) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function validateSkillFields(input: {
+  nombre: string;
+  logoUrl: string;
+  categoria: string;
+  orden: number;
+}) {
+  if (!input.nombre.trim()) {
+    throw new Error("El nombre de la habilidad es obligatorio");
+  }
+  if (!isValidHttpUrl(input.logoUrl)) {
+    throw new Error("La URL del logo es inválida");
+  }
+  const categories = ["Frontend", "Backend", "Herramientas", "Base de datos"];
+  if (!categories.includes(input.categoria)) {
+    throw new Error("La categoría de la habilidad no es válida");
+  }
+  if (input.orden < 0) {
+    throw new Error("El orden debe ser un número positivo");
+  }
+}
+
+export async function crearSkill(formData: FormData) {
+  await requireAdmin();
+
+  const nombre = (formData.get("nombre") as string) || "";
+  const categoria = (formData.get("categoria") as string) || "Frontend";
+  const logoUrl = (formData.get("logoUrl") as string) || "";
+  const orden = parseInteger(formData.get("orden") as string | null, 0);
+
+  validateSkillFields({ nombre, logoUrl, categoria, orden });
+
+  await prisma.skill.create({
+    data: {
+      nombre,
+      categoria,
+      logoUrl,
+      orden,
+    },
+  });
+
+  revalidatePath("/");
+  revalidatePath("/admin/habilidades");
+  redirect("/admin/habilidades");
+}
+
+export async function editarSkill(
+  idOrFormData: string | FormData,
+  maybeFormData?: FormData,
+) {
+  const id =
+    typeof idOrFormData === "string"
+      ? idOrFormData
+      : (idOrFormData.get("skillId") as string);
+  const formData =
+    typeof idOrFormData === "string" ? maybeFormData! : idOrFormData;
+
+  await requireAdmin();
+
+  const nombre = (formData.get("nombre") as string) || "";
+  const categoria = (formData.get("categoria") as string) || "Frontend";
+  const logoUrl = (formData.get("logoUrl") as string) || "";
+  const orden = parseInteger(formData.get("orden") as string | null, 0);
+
+  validateSkillFields({ nombre, logoUrl, categoria, orden });
+
+  await prisma.skill.update({
+    where: { id },
+    data: {
+      nombre,
+      categoria,
+      logoUrl,
+      orden,
+    },
+  });
+
+  revalidatePath("/");
+  revalidatePath("/admin/habilidades");
+  redirect("/admin/habilidades");
+}
+
+export async function eliminarSkill(id: string) {
+  await requireAdmin();
+
+  await prisma.skill.delete({ where: { id } });
+
+  revalidatePath("/");
+  revalidatePath("/admin/habilidades");
 }

@@ -19,15 +19,9 @@ function getStoredTheme(): Theme | null {
   return stored === "light" || stored === "dark" ? stored : null;
 }
 
-function getSystemTheme(): Theme {
-  return typeof window !== "undefined" &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-}
-
 function getTheme(): Theme {
-  return getStoredTheme() ?? getSystemTheme();
+  // Por defecto forzamos el tema claro a menos que el usuario haya elegido uno.
+  return getStoredTheme() ?? "light";
 }
 
 function emitThemeChange() {
@@ -36,16 +30,7 @@ function emitThemeChange() {
 
 function subscribeTheme(callback: () => void) {
   listeners.add(callback);
-  const mq = window.matchMedia("(prefers-color-scheme: dark)");
-  const handleSystemChange = () => {
-    // Solo reaccionar a cambios del sistema si el usuario no eligió uno.
-    if (!getStoredTheme()) callback();
-  };
-  mq.addEventListener("change", handleSystemChange);
-  return () => {
-    listeners.delete(callback);
-    mq.removeEventListener("change", handleSystemChange);
-  };
+  return () => listeners.delete(callback);
 }
 
 const ThemeContext = createContext<{

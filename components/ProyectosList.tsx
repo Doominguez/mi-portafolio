@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import ProjectCard, { type Proyecto } from "./ProjectCard";
 import ProyectoModal from "./ProyectoModal";
+import type { Skill } from "@/lib/skills";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -15,9 +16,11 @@ const fadeUp = {
 export default function ProyectosList({
   destacados,
   otros,
+  skills,
 }: {
   destacados: Proyecto[];
   otros: Proyecto[];
+  skills: Skill[];
 }) {
   const allProjects = [...destacados, ...otros];
   const [selected, setSelected] = useState<Proyecto | null>(null);
@@ -32,13 +35,13 @@ export default function ProyectosList({
 
   return (
     <>
-      <div className="flex flex-wrap justify-center gap-6">
+      <div className="flex flex-wrap justify-center gap-8">
         {allProjects.map((proyecto, i) => (
           <motion.div
             key={proyecto.id}
             {...fadeUp}
             transition={{ duration: 0.5, delay: (i % 3) * 0.06 }}
-            className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
+            className="w-full md:w-[calc((100%-32px)/2)] lg:w-[calc((100%-64px)/3)]"
           >
             <ProjectCard
               proyecto={proyecto}
@@ -50,7 +53,7 @@ export default function ProyectosList({
         ))}
       </div>
 
-      <ProyectoModal proyecto={selected} onClose={() => setSelected(null)} />
+      <ProyectoModal proyecto={selected} onClose={() => setSelected(null)} skills={skills} />
     </>
   );
 }

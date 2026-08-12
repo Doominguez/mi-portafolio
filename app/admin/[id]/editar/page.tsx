@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { getProyectoById } from "@/lib/proyectos";
+import { getSkills } from "@/lib/skills";
 import { editarProyecto } from "@/lib/actions";
 import ProyectoForm from "@/components/ProyectoForm";
 import Link from "next/link";
@@ -18,6 +19,7 @@ export default async function EditarProyectoPage({ params }: Props) {
 
   const { id } = await params;
   const proyecto = await getProyectoById(id);
+  const skills = await getSkills();
   if (!proyecto) notFound();
 
   return (
@@ -51,6 +53,7 @@ export default async function EditarProyectoPage({ params }: Props) {
             desafios: proyecto.desafios || "",
             aprendizajes: proyecto.aprendizajes || "",
           }}
+          availableSkills={skills}
           onSubmit={editarProyecto}
           submitLabel="Guardar cambios"
           proyectoId={id}

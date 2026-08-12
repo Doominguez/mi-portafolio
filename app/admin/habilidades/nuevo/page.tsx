@@ -1,40 +1,33 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { crearProyecto } from "@/lib/actions";
-import { getSkills } from "@/lib/skills";
-import ProyectoForm from "@/components/ProyectoForm";
 import Link from "next/link";
+import { crearSkill } from "@/lib/actions";
+import SkillForm from "@/components/SkillForm";
 import { ArrowLeft } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-export default async function NuevoProyectoPage() {
+export default async function NuevoSkillPage() {
   const session = await auth();
   if (!session) redirect("/admin/login");
-
-  const skills = await getSkills();
 
   return (
     <div className="flex flex-col gap-6">
       <Link
-        href="/admin"
+        href="/admin/habilidades"
         className="inline-flex w-fit items-center gap-1.5 text-sm text-[var(--text-2)] transition-colors hover:text-[var(--text)]"
       >
         <ArrowLeft className="h-4 w-4" />
-        Volver al listado
+        Volver a habilidades
       </Link>
 
       <div>
         <div className="section-label mb-2">Panel de administración</div>
-        <h1 className="heading-xl">Nuevo proyecto</h1>
+        <h1 className="heading-xl">Nuevo logo</h1>
       </div>
 
       <div className="card p-6 sm:p-8">
-        <ProyectoForm
-          availableSkills={skills}
-          onSubmit={crearProyecto}
-          submitLabel="Crear proyecto"
-        />
+        <SkillForm onSubmit={crearSkill} submitLabel="Crear logo" />
       </div>
     </div>
   );

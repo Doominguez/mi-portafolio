@@ -24,10 +24,16 @@ export default async function AdminPage() {
           <div className="section-label mb-2">Panel de administración</div>
           <h1 className="heading-xl">Mis Proyectos</h1>
         </div>
-        <Link href="/admin/nuevo" className="btn-primary">
-          <Plus className="h-4 w-4" />
-          Nuevo proyecto
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/admin/habilidades" className="btn-secondary">
+            <LayoutGrid className="h-4 w-4" />
+            Gestionar logos
+          </Link>
+          <Link href="/admin/nuevo" className="btn-primary">
+            <Plus className="h-4 w-4" />
+            Nuevo proyecto
+          </Link>
+        </div>
       </div>
 
       {proyectos.length === 0 ? (

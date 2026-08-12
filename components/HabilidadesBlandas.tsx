@@ -32,7 +32,7 @@ export default function HabilidadesBlandas() {
       <div className="container-portfolio">
         <motion.div {...fadeUp}>
           <div className="section-label">03 / Soft skills</div>
-          <h2 className="heading-xl mb-16">
+          <h2 className="heading-xl mb-10">
             Habilidades blandas
           </h2>
         </motion.div>

@@ -8,6 +8,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { GithubIcon } from "./SocialIcons";
+import TechLogo from "./TechLogo";
 import ProyectoImagePlaceholder, {
   isGenericImage,
 } from "./ProyectoImagePlaceholder";
@@ -106,7 +107,7 @@ export default function ProjectCard({
         </div>
       </button>
 
-      <div className="p-5 flex flex-col flex-1 gap-4">
+      <div className="p-6 flex flex-col flex-1 gap-5">
         <div className="flex flex-col gap-3">
           <div>
             <h3 className="project-card-title line-clamp-2">
@@ -118,11 +119,9 @@ export default function ProjectCard({
               </p>
             )}
           </div>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {visibleTags.map((tech) => (
-              <span key={tech} className="tech-pill">
-                {tech}
-              </span>
+              <TechLogo key={tech} tech={tech} />
             ))}
             {hiddenTags.length > 0 && (
               <button
@@ -146,18 +145,16 @@ export default function ProjectCard({
             )}
             {showAllTags &&
               hiddenTags.map((tech) => (
-                <span key={tech} className="tech-pill">
-                  {tech}
-                </span>
+                <TechLogo key={tech} tech={tech} />
               ))}
           </div>
         </div>
 
-        <p className="text-sm text-[var(--text-2)] leading-6 line-clamp-3">
+        <p className="text-[15px] text-[var(--text-2)] leading-7 line-clamp-3">
           {proyecto.descripcion}
         </p>
 
-        <div className="mt-auto pt-4 border-t border-[var(--border)] flex flex-col gap-2">
+        <div className="mt-auto pt-5 border-t border-[var(--border)] flex flex-col gap-2">
           {hasActions && (
             <div className="flex flex-wrap gap-2">
               {proyecto.linkGithub && (

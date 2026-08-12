@@ -1,4 +1,5 @@
 import { getProyectos, getProyectosDestacados } from "@/lib/proyectos";
+import { getSkills } from "@/lib/skills";
 import ProyectosList from "./ProyectosList";
 
 export default async function Proyectos() {
@@ -14,16 +15,18 @@ export default async function Proyectos() {
     otros = [];
   }
 
+  const skills = await getSkills();
+
   return (
     <section className="section-padding">
-      <div id="proyectos" className="container-portfolio scroll-mt-24">
+      <div id="proyectos" className="mx-auto px-6 md:px-10 max-w-7xl scroll-mt-24">
         <div className="section-label">01 / Proyectos</div>
         <h2 className="heading-xl mb-4">Proyectos</h2>
-        <p className="text-body text-[var(--text-2)] mb-16 max-w-lg">
+        <p className="text-body text-[var(--text-2)] mb-12 max-w-lg">
           Una selección de sistemas y aplicaciones que he diseñado y
           desarrollado.
         </p>
-        <ProyectosList destacados={destacados} otros={otros} />
+        <ProyectosList destacados={destacados} otros={otros} skills={skills} />
       </div>
     </section>
   );

@@ -16,7 +16,7 @@ export default function Educacion() {
       <div id="educacion" className="container-portfolio scroll-mt-24">
         <motion.div {...fadeUp}>
           <div className="section-label">04 / Formación</div>
-          <h2 className="heading-xl mb-16">
+          <h2 className="heading-xl mb-10">
             Formación e idiomas
           </h2>
         </motion.div>

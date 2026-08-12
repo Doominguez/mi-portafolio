@@ -37,7 +37,7 @@ export default function Contacto() {
           <h2 className="heading-xl mb-6">
             Contacto
           </h2>
-          <p className="text-body text-[var(--text-2)] mb-16 max-w-lg">
+          <p className="text-body text-[var(--text-2)] mb-12 max-w-lg">
             Si tienes una oportunidad o quieres colaborar, estoy disponible.
           </p>
         </motion.div>

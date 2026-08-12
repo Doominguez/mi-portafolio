@@ -24,3 +24,12 @@ model Proyecto {
   desafios        String?
   aprendizajes    String?
 }
+
+model Skill {
+  id        String   @id @default(cuid())
+  nombre    String
+  categoria String
+  logoUrl   String
+  orden     Int      @default(0)
+  createdAt DateTime @default(now())
+}

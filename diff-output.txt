@@ -1,0 +1,302 @@
+diff --git a/components/Hero.tsx b/components/Hero.tsx
+index 5ad4539..c6059ff 100644
+--- a/components/Hero.tsx
++++ b/components/Hero.tsx
+@@ -1,7 +1,7 @@
+ "use client";
+ 
+ import { motion } from "framer-motion";
+-import { Mail, Download, ArrowRight } from "lucide-react";
++import { Mail, ArrowRight } from "lucide-react";
+ import { GithubIcon, LinkedinIcon, JavaIcon } from "./SocialIcons";
+ import EmailLink from "./EmailLink";
+ 
+@@ -46,82 +46,62 @@ export default function Hero() {
+         }}
+       />
+ 
+-      <div className="container-portfolio py-24 md:py-0 relative z-10">
+-        <div className="grid grid-cols-1 md:grid-cols-5 gap-12 md:gap-16 items-center">
+-          {/* Text - 3 columns */}
+-          <div className="md:col-span-3">
+-            <motion.h1
+-              initial={{ opacity: 0, y: 20 }}
+-              animate={{ opacity: 1, y: 0 }}
+-              transition={{ duration: 0.5, delay: 0.1 }}
+-              className="mb-6"
+-              style={{
+-                viewTransitionName: "hero-title",
+-                viewTransitionClass: "title-morph",
+-                fontSize: "clamp(2.2rem, 5.2vw, 4rem)",
+-                fontWeight: 700,
+-                letterSpacing: "-0.03em",
+-                lineHeight: 1.05,
+-              }}
+-            >
+-              Junior Dominguez
+-              <br />
+-              Montero
+-            </motion.h1>
++      <div className="container-portfolio py-20 md:py-24 relative z-10">
++        <div className="mx-auto w-full max-w-4xl rounded-[32px] border border-[var(--border)] bg-[var(--surface)] p-8 shadow-[0_40px_120px_rgba(0,0,0,0.08)] md:p-12">
++          <div className="grid grid-cols-1 lg:grid-cols-[1.7fr_1fr] gap-10 lg:items-center">
++            <div>
++              <motion.h1
++                initial={{ opacity: 0, y: 20 }}
++                animate={{ opacity: 1, y: 0 }}
++                transition={{ duration: 0.5, delay: 0.1 }}
++                className="mb-5"
++                style={{
++                  viewTransitionName: "hero-title",
++                  viewTransitionClass: "title-morph",
++                  fontSize: "clamp(2.2rem, 5.2vw, 4rem)",
++                  fontWeight: 700,
++                  letterSpacing: "-0.03em",
++                  lineHeight: 1.05,
++                }}
++              >
++                Junior Dominguez Montero
++              </motion.h1>
+ 
+-            <motion.p
+-              initial={{ opacity: 0, y: 15 }}
+-              animate={{ opacity: 1, y: 0 }}
+-              transition={{ duration: 0.5, delay: 0.2 }}
+-              className="text-lg md:text-xl font-medium text-[var(--accent-text)] mb-8"
+-            >
+-              Desarrollador Backend{" "}
+-              <span className="inline-flex items-center gap-2">
+-                Java
+-                <JavaIcon className="h-6 w-auto" />
+-              </span>
+-            </motion.p>
++              <motion.p
++                initial={{ opacity: 0, y: 15 }}
++                animate={{ opacity: 1, y: 0 }}
++                transition={{ duration: 0.5, delay: 0.2 }}
++                className="text-lg md:text-xl font-semibold text-[var(--accent-text)] mb-4"
++              >
++                Desarrollador backend Java
++              </motion.p>
+ 
+-            {/* Avatar en móvil: justo debajo del subtítulo, antes de los botones */}
+-            <motion.div
+-              initial={{ opacity: 0, scale: 0.95 }}
+-              animate={{ opacity: 1, scale: 1 }}
+-              transition={{ duration: 0.6, delay: 0.25 }}
+-              className="md:hidden flex justify-center mb-10"
+-            >
+-              {avatarContent}
+-            </motion.div>
++              <motion.p
++                initial={{ opacity: 0, y: 15 }}
++                animate={{ opacity: 1, y: 0 }}
++                transition={{ duration: 0.5, delay: 0.25 }}
++                className="text-body text-[var(--text-2)] mb-8 max-w-xl leading-relaxed"
++              >
++                Construyo APIs REST escalables con Java y Spring Boot, con foco
++                en arquitectura limpia, seguridad y resultados medibles.
++              </motion.p>
+ 
+-            <motion.p
+-              initial={{ opacity: 0, y: 15 }}
+-              animate={{ opacity: 1, y: 0 }}
+-              transition={{ duration: 0.5, delay: 0.3 }}
+-              className="text-body text-[var(--text-2)] mb-10 max-w-xl leading-relaxed"
+-            >
+-              Desarrollo aplicaciones web y APIs REST con Java y Spring Boot,
+-              aplicando arquitectura de software, seguridad y buenas prácticas
+-              para construir soluciones escalables.
+-            </motion.p>
+-
+-            <motion.div
+-              initial={{ opacity: 0, y: 15 }}
+-              animate={{ opacity: 1, y: 0 }}
+-              transition={{ duration: 0.5, delay: 0.4 }}
+-              className="flex flex-col gap-5"
+-            >
+-              {/* Primary + Secondary CTAs */}
+-              <div className="flex flex-wrap items-center gap-3">
+-                <a
+-                  href="/CV_Junior_Dominguez_1.pdf"
+-                  download
+-                  className="btn-primary"
++              <motion.div
++                initial={{ opacity: 0, y: 15 }}
++                animate={{ opacity: 1, y: 0 }}
++                transition={{ duration: 0.5, delay: 0.3 }}
++                className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4"
++              >
++                <EmailLink
++                  className="btn-primary w-full sm:w-auto"
++                  aria-label="Contactarme"
+                 >
+-                  <Download className="w-4 h-4" />
+-                  Descargar CV
+-                </a>
++                  <Mail className="w-4 h-4" />
++                  Contactarme
++                </EmailLink>
+                 <a
+                   href="#proyectos"
+-                  className="btn-secondary"
++                  className="btn-secondary w-full sm:w-auto"
+                   style={{
+                     borderColor: "var(--accent-text)",
+                     color: "var(--accent-text)",
+@@ -130,47 +110,52 @@ export default function Hero() {
+                   Ver proyectos
+                   <ArrowRight className="w-4 h-4" />
+                 </a>
+-              </div>
++              </motion.div>
+ 
+-              {/* Social links - lower weight */}
+-              <div className="flex items-center gap-4 text-sm text-[var(--text-2)]">
++              <motion.div
++                initial={{ opacity: 0, y: 15 }}
++                animate={{ opacity: 1, y: 0 }}
++                transition={{ duration: 0.5, delay: 0.35 }}
++                className="mt-6 flex flex-wrap items-center justify-start gap-3"
++              >
+                 <a
+                   href="https://github.com/doominguez"
+                   target="_blank"
+                   rel="noopener noreferrer"
+-                  className="flex items-center gap-1.5 hover:text-[var(--text)] transition-colors"
++                  aria-label="Ver GitHub"
++                  className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--border)] bg-white text-[var(--text)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                 >
+-                  <GithubIcon className="w-4 h-4" />
+-                  GitHub
++                  <GithubIcon className="w-5 h-5" />
+                 </a>
+-                <span className="text-[var(--border)]">|</span>
+                 <a
+                   href="#"
+                   target="_blank"
+                   rel="noopener noreferrer"
+-                  className="flex items-center gap-1.5 hover:text-[var(--text)] transition-colors"
++                  aria-label="Ver LinkedIn"
++                  className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--border)] bg-white text-[var(--text)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                 >
+-                  <LinkedinIcon className="w-4 h-4" />
+-                  LinkedIn
++                  <LinkedinIcon className="w-5 h-5" />
+                 </a>
+-                <span className="text-[var(--border)]">|</span>
+-                <EmailLink className="flex items-center gap-1.5 hover:text-[var(--text)] transition-colors">
+-                  <Mail className="w-4 h-4" />
+-                  Email
+-                </EmailLink>
+-              </div>
++                <a
++                  href="/CV_Junior_Dominguez_1.pdf"
++                  download
++                  aria-label="Descargar CV"
++                  className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--border)] bg-white text-[var(--text)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
++                >
++                  <ArrowRight className="w-5 h-5 rotate-90" />
++                </a>
++              </motion.div>
++            </div>
++
++            <motion.div
++              initial={{ opacity: 0, scale: 0.97 }}
++              animate={{ opacity: 1, scale: 1 }}
++              transition={{ duration: 0.5, delay: 0.25 }}
++              className="flex justify-center lg:justify-end"
++            >
++              {avatarContent}
+             </motion.div>
+           </div>
+-
+-          {/* Avatar - 2 columns (solo desktop, en móvil va debajo del subtítulo) */}
+-          <motion.div
+-            initial={{ opacity: 0, scale: 0.95 }}
+-            animate={{ opacity: 1, scale: 1 }}
+-            transition={{ duration: 0.6, delay: 0.2 }}
+-            className="hidden md:flex md:col-span-2 justify-center md:justify-end"
+-          >
+-            {avatarContent}
+-          </motion.div>
+         </div>
+       </div>
+ 
+diff --git a/components/Navbar.tsx b/components/Navbar.tsx
+index 10afa3d..8382d05 100644
+--- a/components/Navbar.tsx
++++ b/components/Navbar.tsx
+@@ -73,8 +73,16 @@ export default function Navbar() {
+           style={{ viewTransitionName: "logo" }}
+           aria-label="Volver al inicio"
+         >
+-          <img src="/logo-claro.png" alt="JDM" className="h-14 w-auto object-contain hidden dark:block" />
+-          <img src="/logo-oscuro.png" alt="JDM" className="h-14 w-auto object-contain block dark:hidden" />
++          <img
++            src="/logo-claro.png"
++            alt="JDM"
++            className="h-14 w-auto object-contain hidden dark:block"
++          />
++          <img
++            src="/logo-oscuro.png"
++            alt="JDM"
++            className="h-14 w-auto object-contain block dark:hidden"
++          />
+         </Link>
+ 
+         {/* Desktop nav */}
+@@ -99,53 +107,13 @@ export default function Navbar() {
+             })}
+           </ul>
+ 
+-          <div className="w-px h-6 bg-[var(--border)]" />
+-
+           <div className="flex items-center gap-1">
+-            <a
+-              href="https://github.com/doominguez"
+-              target="_blank"
+-              rel="noopener noreferrer"
+-              className="p-2 rounded-md hover:bg-[var(--surface)] transition-colors"
+-              aria-label="GitHub"
+-            >
+-              <GithubIcon className="w-[18px] h-[18px] text-[var(--text-2)] hover:text-[var(--text)]" />
+-            </a>
+-            <a
+-              href="#"
+-              target="_blank"
+-              rel="noopener noreferrer"
+-              className="p-2 rounded-md hover:bg-[var(--surface)] transition-colors"
+-              aria-label="LinkedIn"
+-            >
+-              <LinkedinIcon className="w-[18px] h-[18px] text-[var(--text-2)] hover:text-[var(--text)]" />
+-            </a>
+-            <div className="w-px h-4 bg-[var(--border)] mx-1" />
+             <ThemeToggle />
+           </div>
+         </div>
+ 
+         {/* Mobile: social icons + toggle + hamburger */}
+         <div className="flex md:hidden items-center gap-1.5">
+-          <a
+-            href="https://github.com/doominguez"
+-            target="_blank"
+-            rel="noopener noreferrer"
+-            className="p-3 rounded-md"
+-            aria-label="GitHub"
+-          >
+-            <GithubIcon className="w-5 h-5 text-[var(--text-2)]" />
+-          </a>
+-          <a
+-            href="#"
+-            target="_blank"
+-            rel="noopener noreferrer"
+-            className="p-3 rounded-md"
+-            aria-label="LinkedIn"
+-          >
+-            <LinkedinIcon className="w-5 h-5 text-[var(--text-2)]" />
+-          </a>
+-          <div className="w-px h-4 bg-[var(--border)] mx-1" />
+           <ThemeToggle className="p-3" />
+           <button
+             onClick={() => setMenuOpen(!menuOpen)}

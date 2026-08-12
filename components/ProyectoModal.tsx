@@ -1,9 +1,18 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, type ReactNode } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import { createPortal } from "react-dom";
+import {
+  X,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  Maximize2,
+} from "lucide-react";
 import { GithubIcon } from "./SocialIcons";
+import TechLogo from "./TechLogo";
+import type { Skill } from "@/lib/skills";
 import ProyectoImagePlaceholder, {
   isGenericImage,
 } from "./ProyectoImagePlaceholder";
@@ -31,6 +40,7 @@ interface Proyecto {
 interface ProyectoModalProps {
   proyecto: Proyecto | null;
   onClose: () => void;
+  skills?: Skill[];
 }
 
 /* ───────────────────────────────────────────────────────────
@@ -106,8 +116,11 @@ function useFocusTrap(
 }
 
 /* ───────────────────────────────────────────────────────────
-   Media Carousel (solo imágenes)
+   Media Carousel (solo imágenes) + Lightbox
    ─────────────────────────────────────────────────────────── */
+
+const focusableSelector =
+  'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"]), textarea, input, select';
 
 function MediaCarousel({
   slides,
@@ -119,10 +132,14 @@ function MediaCarousel({
   tecnologiaPrincipal?: string;
 }) {
   const [slideIndex, setSlideIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [loadedIndexes, setLoadedIndexes] = useState<Set<number>>(new Set());
+  const openerRef = useRef<HTMLButtonElement>(null);
 
   const current = slides[slideIndex] || slides[0];
   const hasPrev = slideIndex > 0;
   const hasNext = slideIndex < slides.length - 1;
+  const isPlaceholder = current === PLACEHOLDER_SLIDE;
 
   const goTo = useCallback((i: number) => {
     setSlideIndex(i);
@@ -136,6 +153,15 @@ function MediaCarousel({
     setSlideIndex((i) => Math.min(slides.length - 1, i + 1));
   }, [slides.length]);
 
+  const markLoaded = useCallback((i: number) => {
+    setLoadedIndexes((currentSet) => {
+      if (currentSet.has(i)) return currentSet;
+      const nextSet = new Set(currentSet);
+      nextSet.add(i);
+      return nextSet;
+    });
+  }, []);
+
   useEffect(() => {
     if (slides.length <= 1) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -146,10 +172,16 @@ function MediaCarousel({
     return () => document.removeEventListener("keydown", handleKey);
   }, [prev, next, slides.length]);
 
+  const openLightbox = () => setLightboxOpen(true);
+  const closeLightbox = () => {
+    setLightboxOpen(false);
+    requestAnimationFrame(() => openerRef.current?.focus());
+  };
+
   return (
-    <div className="relative aspect-video w-full overflow-hidden bg-black">
+    <div className="relative aspect-video w-full overflow-hidden bg-transparent">
       <AnimatePresence mode="wait">
-        {current === PLACEHOLDER_SLIDE ? (
+        {isPlaceholder ? (
           <motion.div
             key="placeholder"
             {...slideFade}
@@ -162,18 +194,33 @@ function MediaCarousel({
             />
           </motion.div>
         ) : (
-          <motion.div
+          <motion.button
+            type="button"
+            ref={openerRef}
             key={`img-${slideIndex}`}
             {...slideFade}
-            className="absolute inset-0"
+            onClick={openLightbox}
+            aria-haspopup="dialog"
+            aria-label={`Ampliar captura ${slideIndex + 1} de ${slides.length} de ${titulo}`}
+            className="carousel-image absolute inset-0 block h-full w-full cursor-zoom-in p-0 text-left"
           >
+            {!loadedIndexes.has(slideIndex) && (
+              <span className="carousel-loader" aria-hidden="true">
+                <span className="spinner" />
+              </span>
+            )}
             <img
               src={current}
               alt={`${titulo} — captura ${slideIndex + 1}`}
               className="h-full w-full object-cover"
               draggable={false}
+              onLoad={() => markLoaded(slideIndex)}
+              onError={() => markLoaded(slideIndex)}
             />
-          </motion.div>
+            <span className="zoom-hint" aria-hidden="true">
+              <Maximize2 className="h-4 w-4" />
+            </span>
+          </motion.button>
         )}
       </AnimatePresence>
 
@@ -214,7 +261,164 @@ function MediaCarousel({
           </div>
         </>
       )}
+
+      {lightboxOpen && !isPlaceholder && (
+        <Lightbox
+          slides={slides}
+          startIndex={slideIndex}
+          titulo={titulo}
+          onClose={closeLightbox}
+        />
+      )}
     </div>
+  );
+}
+
+function Lightbox({
+  slides,
+  startIndex,
+  titulo,
+  onClose,
+}: {
+  slides: string[];
+  startIndex: number;
+  titulo: string;
+  onClose: () => void;
+}) {
+  const [index, setIndex] = useState(startIndex);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const current = slides[index] ?? slides[0];
+
+  const clampIndex = useCallback(
+    (i: number) => (i + slides.length) % slides.length,
+    [slides.length],
+  );
+
+  const prev = useCallback(() => {
+    setIndex((i) => clampIndex(i - 1));
+  }, [clampIndex]);
+
+  const next = useCallback(() => {
+    setIndex((i) => clampIndex(i + 1));
+  }, [clampIndex]);
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+
+    const handleKey = (e: KeyboardEvent) => {
+      // El lightbox intercepta Escape, flechas y Tab (fase de captura) para
+      // no propagar el cierre del modal ni la navegación del carrusel.
+      if (
+        e.key !== "Escape" &&
+        e.key !== "ArrowLeft" &&
+        e.key !== "ArrowRight" &&
+        e.key !== "Tab"
+      ) {
+        return;
+      }
+      e.stopPropagation();
+
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        prev();
+        return;
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        next();
+        return;
+      }
+      if (e.key === "Tab" && boxRef.current) {
+        const focusable = Array.from(
+          boxRef.current.querySelectorAll<HTMLElement>(focusableSelector),
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKey, true);
+    requestAnimationFrame(() => closeRef.current?.focus());
+    return () => document.removeEventListener("keydown", handleKey, true);
+  }, [onClose, prev, next]);
+
+  return createPortal(
+    <div className="fixed inset-0 z-[60]">
+      <motion.div {...fadeIn} className="lightbox-backdrop" onClick={onClose} />
+
+      <div
+        ref={boxRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Vista ampliada de ${titulo}`}
+        className="lightbox-dialog"
+      >
+        <div className="lightbox-header">
+          <span className="lightbox-counter">
+            {index + 1} / {slides.length}
+          </span>
+          <button
+            type="button"
+            ref={closeRef}
+            onClick={onClose}
+            aria-label="Cerrar vista ampliada"
+            className="lightbox-close"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div
+          className="lightbox-stage"
+          onClick={onClose}
+          aria-label={`Ampliada ${index + 1} de ${slides.length}`}
+        >
+          <img
+            src={current}
+            alt={`${titulo} — captura ${index + 1}`}
+            className="lightbox-img"
+            draggable={false}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+
+        {slides.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={prev}
+              aria-label="Imagen anterior"
+              className="lightbox-nav prev"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={next}
+              aria-label="Imagen siguiente"
+              className="lightbox-nav next"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </>
+        )}
+      </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -235,13 +439,6 @@ function parseDescripcion(
     if (match) items.push({ label: match[1].trim(), text: match[2].trim() });
   }
   return items.length >= 2 ? items : null;
-}
-
-// Primer bloque de la descripción ("Resumen: ...") como párrafo de entrada.
-// Si la descripción no tiene ese formato, se usa completa.
-function getDescripcionIntro(descripcion: string): string {
-  const sections = parseDescripcion(descripcion);
-  return sections && sections.length > 0 ? sections[0].text : descripcion;
 }
 
 // Bloques restantes de la descripción ("El problema:", "La solución:", ...)
@@ -267,9 +464,6 @@ function getYouTubeEmbedUrl(url: string) {
     : url;
 }
 
-const listItemDot =
-  "mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]";
-
 /* ───────────────────────────────────────────────────────────
    Dialog (se remonta con key={proyecto.id}, así su estado de
    medios se reinicia al cambiar de proyecto o al abrirse)
@@ -278,11 +472,18 @@ const listItemDot =
 function ProyectoModalDialog({
   proyecto,
   onClose,
+  skills,
 }: {
   proyecto: Proyecto;
   onClose: () => void;
+  skills?: Skill[];
 }) {
   const modalRef = useRef<HTMLDivElement>(null);
+
+  const skillLogoByNombre = new Map<string, string | undefined>();
+  for (const skill of skills ?? []) {
+    skillLogoByNombre.set(skill.nombre.toLowerCase(), skill.logoUrl);
+  }
 
   const [mediaType, setMediaType] = useState<"img" | "video">("img");
   const [videoMounted, setVideoMounted] = useState(false);
@@ -323,126 +524,54 @@ function ProyectoModalDialog({
   const isYouTube = videoUrl ? isYouTubeUrl(videoUrl) : false;
   const embeddedVideoUrl = videoUrl ? getYouTubeEmbedUrl(videoUrl) : null;
 
-  const descripcionIntro = getDescripcionIntro(proyecto.descripcion);
   const descripcionExtras = getDescripcionExtras(proyecto.descripcion);
 
-  const highlightItems: ReactNode[] = [];
-  if (proyecto.funcionalidades?.length) {
-    for (const f of proyecto.funcionalidades) {
-      highlightItems.push(f);
-    }
-  } else if (descripcionExtras) {
-    for (const s of descripcionExtras) {
-      highlightItems.push(
-        <>
-          <strong className="font-semibold text-[var(--text)]">
-            {s.label}
-          </strong>{" "}
-          <span className="text-[var(--text-2)]">{s.text}</span>
-        </>,
-      );
-    }
-  }
-
-  const hasLinks = !!proyecto.linkGithub || !!proyecto.linkDemo;
-
-  const badges: ReactNode[] = [];
-  if (proyecto.destacado) {
-    badges.push(
-      <span
-        key="destacado"
-        className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--bg-2)] px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.06em] text-[var(--text-2)]"
-      >
-        Destacado
-      </span>,
-    );
-  }
-  if (proyecto.linkDemo) {
-    badges.push(
-      <span
-        key="demo"
-        className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(0,115,150,0.4)] bg-[rgba(0,115,150,0.1)] px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.06em] text-[var(--accent)]"
-      >
-        <span
-          className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]"
-          aria-hidden="true"
-        />
-        Demo activa
-      </span>,
-    );
-  }
+  const problemText =
+    descripcionExtras?.find((item) => /problema/i.test(item.label))?.text ||
+    proyecto.desafios;
+  const solutionText =
+    descripcionExtras?.find((item) => /soluci[oó]n/i.test(item.label))?.text ||
+    proyecto.aprendizajes;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-50">
       <motion.div
         {...fadeIn}
         transition={{ duration: 0.15 }}
-        className="absolute inset-0 bg-black/60 backdrop-blur-md"
+        className="modal-overlay"
         onClick={onClose}
-        aria-hidden="true"
-      />
-
-      {/* Dialog */}
-      <div className="pointer-events-none relative flex h-full w-full items-center justify-center p-3 sm:p-6">
+      >
         <motion.div
           ref={modalRef}
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-title"
-          initial={{ opacity: 0, y: 16, scale: 0.98 }}
+          initial={{ opacity: 0, y: 18, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 16, scale: 0.98 }}
+          exit={{ opacity: 0, y: 18, scale: 0.98 }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="pointer-events-auto relative flex w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg)]"
-          style={{ maxHeight: "min(90vh, 90dvh, 850px)" }}
+          className="modal"
+          style={{ maxHeight: "min(90vh, 90dvh, 860px)" }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Cerrar: siempre accesible, fijo sobre el modal */}
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Cerrar"
-            className="absolute right-3 top-3 z-40 flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-black/50 text-white/90 backdrop-blur-md transition-colors hover:bg-black/75 hover:text-white"
-            style={{ minWidth: 44, minHeight: 44 }}
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <div className="modal-header">
+            <div>
+              <div className="eyebrow">Proyecto</div>
+              <h1 id="modal-title">{proyecto.titulo}</h1>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Cerrar"
+              className="close-btn"
+            >
+              <X />
+            </button>
+          </div>
 
-          {/* ── Media + contenido scrollan juntos ── */}
-          <div className="modal-scroll flex-1 overflow-y-auto overscroll-contain">
-            {/* Media (capturas / video) */}
-            <div className="relative shrink-0">
-              {hasVideo && (
-                <div className="absolute left-3 top-3 z-30 flex items-center gap-1 rounded-full border border-white/10 bg-black/50 p-1 backdrop-blur-md">
-                  <button
-                    type="button"
-                    onClick={showCapturas}
-                    aria-pressed={!showVideo}
-                    className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-                      !showVideo
-                        ? "bg-[var(--accent)] text-white"
-                        : "text-white/70 hover:text-white"
-                    }`}
-                  >
-                    Capturas
-                  </button>
-                  <button
-                    type="button"
-                    onClick={showDemo}
-                    aria-pressed={showVideo}
-                    className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-                      showVideo
-                        ? "bg-[var(--accent)] text-white"
-                        : "text-white/70 hover:text-white"
-                    }`}
-                  >
-                    Demo en video
-                  </button>
-                </div>
-              )}
-
-              <div className={showVideo ? "hidden" : "block"}>
+          <div className="modal-body">
+            <div className="hero">
+              <div className="hero-shot">
                 <MediaCarousel
                   slides={slides}
                   titulo={proyecto.titulo}
@@ -450,126 +579,154 @@ function ProyectoModalDialog({
                 />
               </div>
 
-              {videoMounted && hasVideo && videoUrl && (
-                <div
-                  className={`aspect-video w-full bg-black ${
-                    showVideo ? "block" : "hidden"
-                  }`}
-                >
-                  {isYouTube ? (
-                    <iframe
-                      src={embeddedVideoUrl || ""}
-                      title={`Video de demostración de ${proyecto.titulo}`}
-                      className="h-full w-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <video
-                      controls
-                      src={videoUrl}
-                      className="h-full w-full"
-                    />
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Contenido */}
-            <div className="px-6 py-7 sm:px-8 sm:py-8">
-              {badges.length > 0 && (
-                <div className="mb-3 flex flex-wrap items-center gap-2">
-                  {badges}
-                </div>
-              )}
-
-              <h2 id="modal-title" className="heading-lg">
-                {proyecto.titulo}
-              </h2>
-
-              <p className="mt-4 text-[15px] leading-relaxed text-[var(--text-2)]">
-                {descripcionIntro}
-              </p>
-
-              {proyecto.tecnologias.length > 0 && (
-                <section className="mt-7">
-                  <h3 className="modal-section-label">Stack</h3>
-                  <div className="flex flex-wrap gap-2">
+              <div className="summary-card">
+                <div className="summary-row">
+                  <div className="k">Tecnologías utilizadas</div>
+                  <div className="stack-tags">
                     {proyecto.tecnologias.map((tech) => (
-                      <span key={tech} className="tech-pill">
-                        {tech}
-                      </span>
+                      <TechLogo
+                        key={tech}
+                        tech={tech}
+                        size="sm"
+                        logoUrl={skillLogoByNombre.get(tech.toLowerCase())}
+                      />
                     ))}
                   </div>
-                </section>
-              )}
-
-              {highlightItems.length > 0 && (
-                <section className="mt-7">
-                  <h3 className="modal-section-label">Lo principal</h3>
-                  <ul className="space-y-2.5">
-                    {highlightItems.map((item, i) => (
-                      <li
-                        key={i}
-                        className="flex items-start gap-2.5 text-[15px] leading-relaxed text-[var(--text)]"
-                      >
-                        <span className={listItemDot} />
-                        <p>{item}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              )}
-
-              {proyecto.desafios && (
-                <section className="mt-7">
-                  <h3 className="modal-section-label">Desafío técnico</h3>
-                  <p className="text-[15px] leading-relaxed text-[var(--text-2)]">
-                    {proyecto.desafios}
-                  </p>
-                </section>
-              )}
-
-              {proyecto.aprendizajes && (
-                <section className="mt-7">
-                  <h3 className="modal-section-label">Resultados</h3>
-                  <p className="text-[15px] leading-relaxed text-[var(--text-2)]">
-                    {proyecto.aprendizajes}
-                  </p>
-                </section>
-              )}
+                </div>
+              </div>
             </div>
+
+            <section className="about">
+              <div className="section-label">Sobre el proyecto</div>
+              <p>{proyecto.descripcion}</p>
+            </section>
+
+            {(problemText || solutionText) && (
+              <section>
+                <div className="section-label">Problema y solución</div>
+                <div className="prob-sol">
+                  {problemText ? (
+                    <div className="ps-card problem">
+                      <div className="tag">Problema</div>
+                      <p>{problemText}</p>
+                    </div>
+                  ) : null}
+                  {solutionText ? (
+                    <div className="ps-card solution">
+                      <div className="tag">Solución</div>
+                      <p>{solutionText}</p>
+                    </div>
+                  ) : null}
+                </div>
+              </section>
+            )}
+
+            {hasVideo && (
+              <section>
+                <div className="section-label">Demostración</div>
+                <div className="demo-frame">
+                  {showVideo && hasVideo && videoMounted ? (
+                    <>
+                      {isYouTube ? (
+                        <iframe
+                          src={embeddedVideoUrl || ""}
+                          title={`Video de demostración de ${proyecto.titulo}`}
+                          className="h-full w-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <video
+                          controls
+                          src={videoUrl ?? undefined}
+                          className="h-full w-full"
+                        />
+                      )}
+                      <button
+                        type="button"
+                        onClick={showCapturas}
+                        aria-label="Cerrar video"
+                        className="video-close-btn"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </>
+                  ) : (
+                    <div className="relative flex h-full w-full items-center justify-center">
+                      {hasVideo && (
+                        <button
+                          type="button"
+                          onClick={showDemo}
+                          className="play-btn"
+                          aria-label="Reproducir demo"
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
+
+            {proyecto.funcionalidades.length > 0 && (
+              <section>
+                <div className="section-label">Funcionalidades</div>
+                <div className="features-grid">
+                  {proyecto.funcionalidades.map((funcionalidad) => (
+                    <div key={funcionalidad} className="feature-pill">
+                      <span className="dot">
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                        >
+                          <path d="M20 6 9 17l-5-5" />
+                        </svg>
+                      </span>
+                      {funcionalidad}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
 
-          {/* ── Acciones (fijas, siempre visibles) ── */}
-          {hasLinks && (
-            <div className="flex shrink-0 gap-2.5 border-t border-[var(--border)] bg-[var(--bg)] p-4 sm:p-5">
-              {proyecto.linkGithub && (
-                <a
-                  href={proyecto.linkGithub}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-secondary flex-1"
-                >
-                  <GithubIcon className="h-4 w-4" />
-                  GitHub
-                </a>
-              )}
-              {proyecto.linkDemo && (
-                <a
-                  href={proyecto.linkDemo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary flex-1"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  Visitar proyecto
-                </a>
-              )}
-            </div>
-          )}
+          <div className="modal-footer">
+            {proyecto.linkGithub && (
+              <a
+                href={proyecto.linkGithub}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary"
+              >
+                <GithubIcon className="h-4 w-4" />
+                GitHub
+              </a>
+            )}
+            {proyecto.linkDemo && (
+              <a
+                href={proyecto.linkDemo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Ver demo
+              </a>
+            )}
+          </div>
         </motion.div>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -581,6 +738,7 @@ function ProyectoModalDialog({
 export default function ProyectoModal({
   proyecto,
   onClose,
+  skills,
 }: ProyectoModalProps) {
   const isOpen = proyecto !== null;
 
@@ -591,6 +749,7 @@ export default function ProyectoModal({
           key={proyecto.id}
           proyecto={proyecto}
           onClose={onClose}
+          skills={skills}
         />
       )}
     </AnimatePresence>
