@@ -15,8 +15,16 @@ export default function Footer() {
     <footer className="py-10 border-t border-[var(--border)]">
       <div className="container-portfolio flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="shrink-0">
-          <img src="/logo-claro.png" alt="JDM" className="h-12 w-auto object-contain hidden dark:block" />
-          <img src="/logo-oscuro.png" alt="JDM" className="h-12 w-auto object-contain block dark:hidden" />
+          <img
+            src="/logo-claro.png"
+            alt="JDM"
+            className="h-12 w-auto object-contain hidden dark:block"
+          />
+          <img
+            src="/logo-oscuro.png"
+            alt="JDM"
+            className="h-12 w-auto object-contain block dark:hidden"
+          />
         </div>
 
         <div className="flex items-center gap-5">
@@ -34,7 +42,7 @@ export default function Footer() {
             GitHub
           </a>
           <a
-            href="#"
+            href="https://www.linkedin.com/in/juniordominguez/"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-sm text-[var(--text-2)] hover:text-[var(--text)] transition-colors"

@@ -112,7 +112,7 @@ export default function Hero() {
               {/* Primary + Secondary CTAs */}
               <div className="flex flex-wrap items-center gap-3">
                 <a
-                  href="/CV_Junior_Dominguez_1.pdf"
+                  href="/CV_Junior_Dominguez_2026.pdf"
                   download
                   className="btn-primary"
                 >
@@ -145,7 +145,7 @@ export default function Hero() {
                 </a>
                 <span className="text-[var(--border)]">|</span>
                 <a
-                  href="#"
+                  href="https://www.linkedin.com/in/juniordominguez/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1.5 hover:text-[var(--text)] transition-colors"

@@ -15,8 +15,8 @@ const contactos = [
   },
   {
     label: "LinkedIn",
-    value: "LinkedIn",
-    href: "#",
+    value: "linkedin.com/in/juniordominguez",
+    href: "https://www.linkedin.com/in/juniordominguez/",
     icon: LinkedinIcon,
   },
 ];
@@ -34,9 +34,7 @@ export default function Contacto() {
       <div id="contacto" className="container-portfolio scroll-mt-24">
         <motion.div {...fadeUp}>
           <div className="section-label">05 / Contacto</div>
-          <h2 className="heading-xl mb-6">
-            Contacto
-          </h2>
+          <h2 className="heading-xl mb-6">Contacto</h2>
           <p className="text-body text-[var(--text-2)] mb-12 max-w-lg">
             Si tienes una oportunidad o quieres colaborar, estoy disponible.
           </p>
@@ -74,7 +72,9 @@ export default function Contacto() {
                 key={c.label}
                 href={c.href}
                 target={c.href.startsWith("http") ? "_blank" : undefined}
-                rel={c.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                rel={
+                  c.href.startsWith("http") ? "noopener noreferrer" : undefined
+                }
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
