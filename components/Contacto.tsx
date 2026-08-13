@@ -30,8 +30,8 @@ const fadeUp = {
 
 export default function Contacto() {
   return (
-    <section className="section-padding">
-      <div id="contacto" className="container-portfolio scroll-mt-24">
+    <section id="contacto" className="section-padding scroll-mt-16">
+      <div className="container-portfolio">
         <motion.div {...fadeUp}>
           <div className="section-label">05 / Contacto</div>
           <h2 className="heading-xl mb-6">Contacto</h2>

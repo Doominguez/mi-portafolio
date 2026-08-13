@@ -6,6 +6,8 @@ import Educacion from "@/components/Educacion";
 import Contacto from "@/components/Contacto";
 import { getSkills } from "@/lib/skills";
 
+export const revalidate = 0;
+
 export default async function Home() {
   const skills = await getSkills();
 

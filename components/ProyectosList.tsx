@@ -35,19 +35,20 @@ export default function ProyectosList({
 
   return (
     <>
-      <div className="flex flex-wrap justify-center gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {allProjects.map((proyecto, i) => (
           <motion.div
             key={proyecto.id}
             {...fadeUp}
             transition={{ duration: 0.5, delay: (i % 3) * 0.06 }}
-            className="w-full md:w-[calc((100%-32px)/2)] lg:w-[calc((100%-64px)/3)]"
+            className="w-full flex"
           >
             <ProjectCard
               proyecto={proyecto}
               index={i}
               total={allProjects.length}
               onDetalles={setSelected}
+              skills={skills}
             />
           </motion.div>
         ))}

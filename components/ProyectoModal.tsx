@@ -251,11 +251,10 @@ function MediaCarousel({
                 key={i}
                 onClick={() => goTo(i)}
                 aria-label={`Ir a la captura ${i + 1}`}
-                className={`h-2 rounded-full transition-all duration-200 ${
-                  i === slideIndex
+                className={`h-2 rounded-full transition-all duration-200 ${i === slideIndex
                     ? "w-6 bg-[var(--accent)]"
                     : "w-2 bg-white/50 hover:bg-white/80"
-                }`}
+                  }`}
               />
             ))}
           </div>

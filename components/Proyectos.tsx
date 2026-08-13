@@ -18,8 +18,8 @@ export default async function Proyectos() {
   const skills = await getSkills();
 
   return (
-    <section className="section-padding">
-      <div id="proyectos" className="mx-auto px-6 md:px-10 max-w-7xl scroll-mt-24">
+    <section id="proyectos" className="section-padding scroll-mt-16">
+      <div className="container-portfolio">
         <div className="section-label">01 / Proyectos</div>
         <h2 className="heading-xl mb-4">Proyectos</h2>
         <p className="text-body text-[var(--text-2)] mb-12 max-w-lg">

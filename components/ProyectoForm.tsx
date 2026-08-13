@@ -47,25 +47,42 @@ export default function ProyectoForm({
     initialData?.screenshots || "",
   );
 
-  const availableSkillNames = new Set(
-    (availableSkills || []).map((skill) => skill.nombre.toLowerCase()),
+  const skillMapByLowerName = new Map(
+    (availableSkills || []).map((skill) => [skill.nombre.toLowerCase(), skill.nombre]),
   );
+
   const initialTecnologias = (initialData?.tecnologias || "")
     .split(",")
     .map((tech) => tech.trim())
     .filter(Boolean);
-  const initialSelectedSkills = initialTecnologias.filter((tech) =>
-    availableSkillNames.has(tech.toLowerCase()),
-  );
-  const initialManualTecnologias = initialTecnologias
-    .filter((tech) => !availableSkillNames.has(tech.toLowerCase()))
-    .join(", ");
+
+  const matchedSkills: string[] = [];
+  const matchedManual: string[] = [];
+
+  for (const tech of initialTecnologias) {
+    const lower = tech.toLowerCase();
+    if (skillMapByLowerName.has(lower)) {
+      matchedSkills.push(skillMapByLowerName.get(lower)!);
+    } else {
+      // Check partial/keyword match against available skills
+      const foundExactSkill = (availableSkills || []).find(
+        (s) =>
+          s.nombre.toLowerCase().includes(lower) ||
+          lower.includes(s.nombre.toLowerCase()),
+      );
+      if (foundExactSkill) {
+        matchedSkills.push(foundExactSkill.nombre);
+      } else {
+        matchedManual.push(tech);
+      }
+    }
+  }
 
   const [selectedSkills, setSelectedSkills] = useState<string[]>(
-    initialSelectedSkills,
+    Array.from(new Set(matchedSkills)),
   );
   const [manualTecnologias, setManualTecnologias] = useState(
-    initialManualTecnologias,
+    matchedManual.join(", "),
   );
   const [uploading, setUploading] = useState(false);
   const [uploadingScreenshots, setUploadingScreenshots] = useState(false);
@@ -382,6 +399,67 @@ export default function ProyectoForm({
           Si necesitás una tecnología que no está en Habilidades técnicas, podés
           escribirla acá.
         </p>
+      </div>
+
+      {/* Live Technology Stack Preview */}
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--accent-text)]">
+            Stack asignado al proyecto ({getSelectedTecnologias().length})
+          </label>
+        </div>
+
+        {getSelectedTecnologias().length > 0 ? (
+          <div className="flex flex-wrap gap-2 pt-1">
+            {getSelectedTecnologias().map((tech) => {
+              const matchedSkill = (availableSkills || []).find(
+                (s) => s.nombre.toLowerCase() === tech.toLowerCase(),
+              );
+
+              return (
+                <span
+                  key={tech}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-2)] text-xs font-semibold text-[var(--text)] group hover:border-[var(--accent)] transition-colors"
+                >
+                  {matchedSkill?.logoUrl && (
+                    <img
+                      src={matchedSkill.logoUrl}
+                      alt={tech}
+                      className="w-4 h-4 object-contain"
+                    />
+                  )}
+                  <span>{tech}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (selectedSkills.includes(tech)) {
+                        setSelectedSkills((prev) =>
+                          prev.filter((t) => t !== tech),
+                        );
+                      } else {
+                        setManualTecnologias((prev) =>
+                          prev
+                            .split(",")
+                            .map((t) => t.trim())
+                            .filter((t) => t.toLowerCase() !== tech.toLowerCase())
+                            .join(", "),
+                        );
+                      }
+                    }}
+                    className="ml-1 text-[var(--text-2)] hover:text-red-500 font-bold transition-colors"
+                    title={`Remover ${tech}`}
+                  >
+                    ×
+                  </button>
+                </span>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-xs text-[var(--text-2)] italic pt-1">
+            No has asignado ninguna tecnología a este proyecto aún.
+          </p>
+        )}
       </div>
 
       <input

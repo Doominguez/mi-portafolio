@@ -1,14 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import {
-  ArrowUpRight,
-  ChevronDown,
-  ChevronUp,
-  ExternalLink,
-} from "lucide-react";
+import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { GithubIcon } from "./SocialIcons";
-import TechLogo from "./TechLogo";
+import TechStackRow from "./TechStackRow";
 import ProyectoImagePlaceholder, {
   isGenericImage,
 } from "./ProyectoImagePlaceholder";
@@ -29,16 +23,14 @@ export interface Proyecto {
   aprendizajes: string | null;
 }
 
-// Cantidad de tecnologías visibles por card antes de colapsar el resto en
-// "+N tecnologías". Mantiene la altura de las cards consistente en el grid
-// sin importar cuántas tecnologías tenga cada proyecto.
-const MAX_TAGS_VISIBLE = 5;
+import type { Skill } from "@/lib/skills";
 
 interface ProjectCardProps {
   proyecto: Proyecto;
   index: number;
   total: number;
   onDetalles: (proyecto: Proyecto) => void;
+  skills?: Skill[];
 }
 
 export default function ProjectCard({
@@ -46,128 +38,99 @@ export default function ProjectCard({
   index,
   total,
   onDetalles,
+  skills,
 }: ProjectCardProps) {
-  const [showAllTags, setShowAllTags] = useState(false);
-  const visibleTags = proyecto.tecnologias.slice(0, MAX_TAGS_VISIBLE);
-  const hiddenTags = proyecto.tecnologias.slice(MAX_TAGS_VISIBLE);
   const usePlaceholder = isGenericImage(proyecto.imagenUrl);
   const hasActions = !!proyecto.linkGithub || !!proyecto.linkDemo;
-  const hiddenLabel = `+${hiddenTags.length} ${
-    hiddenTags.length === 1 ? "tecnología" : "tecnologías"
-  }`;
 
-  // Si el título incluye un descriptor (ej. "LumenStore — Sistema de Gestión
-  // Comercial"), se muestra el nombre como título y el descriptor como
-  // subtítulo. Así las tarjetas mantienen títulos de longitud equilibrada.
   const [tituloPrincipal, ...subtituloParts] = proyecto.titulo.split("—");
   const subtitulo = subtituloParts.length > 0
     ? subtituloParts.join("—").trim()
     : null;
 
   return (
-    <article className="card project-card group flex flex-col h-full overflow-hidden">
+    <article className="group flex flex-col h-full rounded-2xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden transition-all duration-300 hover:border-[var(--accent)]/40 hover:shadow-xl hover:-translate-y-1">
+      {/* Clickable Image Preview */}
       <button
         type="button"
         onClick={() => onDetalles(proyecto)}
-        title={`Ver detalles de ${proyecto.titulo}`}
+        title={`Ver caso técnico de ${proyecto.titulo}`}
         aria-haspopup="dialog"
         aria-label={`Ver detalles de ${proyecto.titulo}`}
         className="block w-full p-0 border-0 bg-transparent text-left cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
       >
-        <div className="relative aspect-video overflow-hidden">
+        <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--bg-2)] border-b border-[var(--border)]">
           {usePlaceholder ? (
             <ProyectoImagePlaceholder
               titulo={proyecto.titulo}
               tecnologiaPrincipal={proyecto.tecnologias[0]}
-              className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+              className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
             />
           ) : (
             <img
               src={proyecto.imagenUrl!}
               alt={`Captura del proyecto ${proyecto.titulo}`}
-              className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+              className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
               loading="lazy"
             />
           )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
 
-          {proyecto.destacado && (
-            <div className="absolute left-4 top-4">
-              <span className="project-badge">Destacado</span>
-            </div>
-          )}
+          {/* Minimalist Top Badges */}
+          <div className="absolute inset-x-4 top-4 flex items-center justify-between pointer-events-none">
+            {proyecto.destacado ? (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 backdrop-blur-md shadow-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Destacado
+              </span>
+            ) : (
+              <div />
+            )}
 
-          <span
-            className="absolute right-4 top-4 font-mono text-[11px] font-medium tracking-widest text-white/60 pointer-events-none select-none [text-shadow:0_1px_2px_rgba(0,0,0,0.6)]"
-            aria-hidden="true"
-          >
-            {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
-          </span>
+            <span
+              className="px-2.5 py-0.5 rounded-full font-mono text-[11px] font-medium text-white/80 bg-black/40 border border-white/10 backdrop-blur-md select-none"
+              aria-hidden="true"
+            >
+              {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+            </span>
+          </div>
         </div>
       </button>
 
-      <div className="p-6 flex flex-col flex-1 gap-5">
-        <div className="flex flex-col gap-3">
-          <div>
-            <h3 className="project-card-title line-clamp-2">
-              {tituloPrincipal.trim()}
-            </h3>
-            {subtitulo && (
-              <p className="mt-1 text-xs font-medium text-[var(--text-2)] line-clamp-1">
-                {subtitulo}
-              </p>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {visibleTags.map((tech) => (
-              <TechLogo key={tech} tech={tech} />
-            ))}
-            {hiddenTags.length > 0 && (
-              <button
-                type="button"
-                className="tech-pill tech-pill-toggle"
-                onClick={() => setShowAllTags((v) => !v)}
-                aria-expanded={showAllTags}
-                aria-label={
-                  showAllTags
-                    ? "Ocultar tecnologías adicionales"
-                    : `Mostrar ${hiddenTags.length} tecnologías adicionales`
-                }
-              >
-                {showAllTags ? "Ocultar" : hiddenLabel}
-                {showAllTags ? (
-                  <ChevronUp className="w-3 h-3" />
-                ) : (
-                  <ChevronDown className="w-3 h-3" />
-                )}
-              </button>
-            )}
-            {showAllTags &&
-              hiddenTags.map((tech) => (
-                <TechLogo key={tech} tech={tech} />
-              ))}
-          </div>
+      {/* Content Container */}
+      <div className="p-5 sm:p-6 flex flex-col flex-1 gap-4">
+        <div>
+          <h3 className="text-xl font-bold tracking-tight text-[var(--text)] group-hover:text-[var(--accent-text)] transition-colors duration-200 line-clamp-1">
+            {tituloPrincipal.trim()}
+          </h3>
+          {subtitulo && (
+            <p className="mt-1 text-xs text-[var(--text-2)] font-medium line-clamp-1">
+              {subtitulo}
+            </p>
+          )}
         </div>
 
-        <p className="text-[15px] text-[var(--text-2)] leading-7 line-clamp-3">
+        {/* Tech Stack – single row with overflow button */}
+        <TechStackRow techs={proyecto.tecnologias} skills={skills} />
+
+        <p className="text-sm text-[var(--text-2)] leading-relaxed line-clamp-2 sm:line-clamp-3">
           {proyecto.descripcion}
         </p>
 
-        <div className="mt-auto pt-5 border-t border-[var(--border)] flex flex-col gap-2">
-          {hasActions && (
-            <div className="flex flex-wrap gap-2">
+        {/* Actions Row */}
+        <div className="mt-auto pt-4 border-t border-[var(--border)] flex items-center justify-between gap-3">
+          {hasActions ? (
+            <div className="flex items-center gap-2">
               {proyecto.linkGithub && (
                 <a
                   href={proyecto.linkGithub}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`btn-card btn-card-ghost ${
-                    proyecto.linkDemo ? "" : "flex-1"
-                  }`}
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--text-2)] hover:text-[var(--text)] px-3 py-1.5 rounded-lg bg-[var(--bg)] border border-[var(--border)] transition-colors"
                   aria-label={`Ver código en GitHub de ${proyecto.titulo}`}
                 >
-                  <GithubIcon className="w-4 h-4" />
+                  <GithubIcon className="w-3.5 h-3.5" />
                   GitHub
                 </a>
               )}
@@ -176,27 +139,27 @@ export default function ProjectCard({
                   href={proyecto.linkDemo}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`btn-card btn-card-primary ${
-                    proyecto.linkGithub ? "" : "flex-1"
-                  }`}
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-white bg-[var(--accent)] hover:bg-[var(--accent-hover)] px-3 py-1.5 rounded-lg transition-colors shadow-xs"
                   aria-label={`Visitar el sitio de ${proyecto.titulo}`}
                 >
-                  <ExternalLink className="w-4 h-4" />
-                  Visitar proyecto
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  Demo
                 </a>
               )}
             </div>
+          ) : (
+            <div />
           )}
 
           <button
             type="button"
             onClick={() => onDetalles(proyecto)}
-            className="card-details-link w-full"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--accent-text)] hover:text-[var(--accent-hover)] transition-colors cursor-pointer group/btn ml-auto"
             aria-haspopup="dialog"
             aria-label={`Ver caso técnico de ${proyecto.titulo}`}
           >
-            Ver caso técnico
-            <ArrowUpRight className="w-3.5 h-3.5" />
+            <span>Caso técnico</span>
+            <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
           </button>
         </div>
       </div>
